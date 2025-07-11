@@ -1,0 +1,43 @@
+from pypdf import PdfReader
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+import chromadb
+import pandas as pd
+
+file_path = "/Users/ugurekinci/Documents/Advanced RAG/microsoft-annual-report.pdf"
+embedding_model = SentenceTransformerEmbeddingFunction()
+
+def extract_text_from_pdf(file_path):
+    text = []
+    with open(file_path, "rb") as f:
+        pdf = PdfReader(f)
+        for page_num in range(pdf.get_num_pages()):
+            page = pdf.get_page(page_num)
+            text.append(page.extract_text())
+    return "/n".join(text)
+
+
+def embedding_data(file_name):
+    embedding_function = SentenceTransformerEmbeddingFunction()
+    text = extract_text_from_pdf(file_name)
+    chunks = text.split("/n/n")
+    embeddings = [embedding_function(chunk) for chunk in chunks]
+    return embeddings
+
+def chromadb_setup(collection_name = "microsoft_report_pdf"):
+    chroma_client = chromadb.Client()
+    chroma_collection = chroma_client.create_collection(name = collection_name, embedding_function = embedding_model)
+    return chroma_collection
+
+def create_df(file_name):
+    text = extract_text_from_pdf(file_name)
+    embeddings = embedding_data(file_name)
+    df_dictionary = {"text": text, "embeddings": embeddings}
+    df = pd.DataFrame(df_dictionary)
+    return df
+
+def data_loader(pdf_file, chroma_collection):
+    df = create_df(pdf_file)
+    collection = chromadb_setup(chroma_collection)
+    for index, row in df.iterrows():
+        collection.add(ids = index, documents=row["text"], embeddings=row["embeddings"])
+    return collection
