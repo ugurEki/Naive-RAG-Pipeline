@@ -3,7 +3,7 @@ from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunct
 import chromadb
 import pandas as pd
 
-file_path = "/Users/ugurekinci/Documents/Advanced RAG/microsoft-annual-report.pdf"
+file_path = "/Users/ugurekinci/Documents/Naive_RAG_Pipeline/Naive-RAG-Pipeline/microsoft-annual-report.pdf"
 embedding_model = SentenceTransformerEmbeddingFunction()
 
 def extract_text_from_pdf(file_path):
