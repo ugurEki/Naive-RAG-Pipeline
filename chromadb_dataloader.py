@@ -3,7 +3,6 @@ from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunct
 import chromadb
 import pandas as pd
 
-file_path = "/Users/ugurekinci/Documents/Naive_RAG_Pipeline/Naive-RAG-Pipeline/microsoft-annual-report.pdf"
 embedding_model = SentenceTransformerEmbeddingFunction()
 
 def extract_text_from_pdf(file_path):
@@ -17,7 +16,7 @@ def extract_text_from_pdf(file_path):
 
 
 def embedding_data(text):
-    chunks = text.split("/n/n")
+    chunks = text.split("\n\n")
     embedding_function = SentenceTransformerEmbeddingFunction()
     embeddings = [embedding_function(chunk) for chunk in chunks]
     return embeddings
@@ -33,10 +32,16 @@ def create_df(text, embeddings):
     return df
 
 def data_loader(pdf_file, chroma_collection):
-    text = extract_text_from_pdf(file_name)
+    text = extract_text_from_pdf(pdf_file)
     embeddings = embedding_data(text)
     df = create_df(text, embeddings)
     collection = chromadb_setup(chroma_collection)
     for index, row in df.iterrows():
         collection.add(ids = index, documents=row["text"], embeddings=row["embeddings"])
     return collection
+file_path = "/Users/ugurekinci/Documents/Naive_RAG_Pipeline/Naive-RAG-Pipeline/microsoft-annual-report.pdf"
+
+text = extract_text_from_pdf(file_path)
+
+embedded_vector = embedding_data(text)
+print(embedded_vector[0:10])
