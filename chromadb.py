@@ -16,27 +16,26 @@ def extract_text_from_pdf(file_path):
     return "/n".join(text)
 
 
-def embedding_data(file_name):
-    embedding_function = SentenceTransformerEmbeddingFunction()
-    text = extract_text_from_pdf(file_name)
+def embedding_data(text):
     chunks = text.split("/n/n")
+    embedding_function = SentenceTransformerEmbeddingFunction()
     embeddings = [embedding_function(chunk) for chunk in chunks]
     return embeddings
 
-def chromadb_setup(collection_name = "microsoft_report_pdf"):
+def chromadb_setup(collection_name):
     chroma_client = chromadb.Client()
     chroma_collection = chroma_client.create_collection(name = collection_name, embedding_function = embedding_model)
     return chroma_collection
 
-def create_df(file_name):
-    text = extract_text_from_pdf(file_name)
-    embeddings = embedding_data(file_name)
+def create_df(text, embeddings):
     df_dictionary = {"text": text, "embeddings": embeddings}
     df = pd.DataFrame(df_dictionary)
     return df
 
 def data_loader(pdf_file, chroma_collection):
-    df = create_df(pdf_file)
+    text = extract_text_from_pdf(file_name)
+    embeddings = embedding_data(text)
+    df = create_df(text, embeddings)
     collection = chromadb_setup(chroma_collection)
     for index, row in df.iterrows():
         collection.add(ids = index, documents=row["text"], embeddings=row["embeddings"])
