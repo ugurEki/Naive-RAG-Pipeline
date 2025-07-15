@@ -34,5 +34,5 @@ file_path_md = "/Users/ugurekinci/Documents/Naive_RAG_Pipeline/Naive-RAG-Pipelin
 
 # create_markdown_doc = create_markdown_file(file_path, output=True)
 
-read_markdown_doc = read_md(file_path_md)
-print(read_markdown_doc)
+# read_markdown_doc = read_md(file_path_md)
+# print(read_markdown_doc)
